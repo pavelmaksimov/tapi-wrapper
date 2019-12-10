@@ -2,12 +2,12 @@
 
 from __future__ import unicode_literals
 
-__author__ = 'Filipe Ximenes'
-__email__ = 'filipeximenes@gmail.com'
-__version__ = '1.5.1'
+__author__ = 'Pavel Maksimov'
+__email__ = 'vur21@ya.ru'
+__version__ = '2019.12.10'
 
 
 from .adapters import (
     generate_wrapper_from_adapter,
-    TapiocaAdapter,
+    TapiAdapter,
     FormAdapterMixin, JSONAdapterMixin)
