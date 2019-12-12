@@ -45,5 +45,9 @@ setup(
     license="MIT",
     zip_safe=False,
     keywords="tapi,tapioca,wrapper,api",
-    classifiers=['Programming Language :: Python :: 3.5'],
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+    ],
+    python_requires='>=3.5',
 )
