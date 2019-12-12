@@ -1,3 +1,7 @@
 .cache
 .git
 .idea
+.pypirc
+build
+dist
+tapi_wrapper.egg-info
