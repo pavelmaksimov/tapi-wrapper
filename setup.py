@@ -9,12 +9,12 @@ except ImportError:
 import os
 import re
 
-description = """
-Обернутые API следуют простому шаблону взаимодействия, 
-который работает равномерно, поэтому разработчикам не нужно 
-учиться использовать новый интерфейс/стиль кодирования 
-для каждой службы API.
-"""
+try:
+    import pypandoc
+
+    readme = pypandoc.convert("README.md", "rst")
+except (IOError, ImportError):
+    readme = ""
 
 package = "tapi"
 requirements = ["requests[security]>=2.6", "arrow>=0.6.0,<1", "six>=1"]
@@ -34,7 +34,7 @@ setup(
     name="tapi-wrapper",
     version=get_version(package),
     description="Обертка для написания библиотек для API",
-    long_description=description,
+    long_description=readme,
     author="Pavel Maksimov",
     author_email="vur21@ya.ru",
     url="https://github.com/pavelmaksimov/tapi-wrapper",
