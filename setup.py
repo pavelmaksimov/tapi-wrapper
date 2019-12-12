@@ -39,7 +39,7 @@ setup(
     long_description=description,
     author="Pavel Maksimov",
     author_email="vur21@ya.ru",
-    url="",
+    url="https://github.com/pavelmaksimov/tapi-wrapper",
     packages=["tapi"],
     package_dir={"tapi": "tapi"},
     include_package_data=True,
@@ -47,5 +47,5 @@ setup(
     license="MIT",
     zip_safe=False,
     keywords="tapi,tapioca,wrapper,api",
-    classifiers=["python>=3.5"],
+    classifiers=['Programming Language :: Python :: 3.5'],
 )
