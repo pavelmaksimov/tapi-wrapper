@@ -39,7 +39,6 @@ setup(
     author_email="vur21@ya.ru",
     url="https://github.com/pavelmaksimov/tapi-wrapper",
     packages=["tapi"],
-    package_dir={"tapi": "tapi"},
     include_package_data=True,
     install_requires=requirements,
     license="MIT",
