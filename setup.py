@@ -10,8 +10,6 @@ import os
 import re
 
 description = """
-Обертка для написания библиотек для API
-
 Обернутые API следуют простому шаблону взаимодействия, 
 который работает равномерно, поэтому разработчикам не нужно 
 учиться использовать новый интерфейс/стиль кодирования 
@@ -35,11 +33,11 @@ def get_version(package):
 setup(
     name="tapi-wrapper",
     version=get_version(package),
-    description="Python API library generator",
+    description="Обертка для написания библиотек для API",
     long_description=description,
     author="Pavel Maksimov",
     author_email="vur21@ya.ru",
-    url="",
+    url="https://github.com/pavelmaksimov/tapi-wrapper",
     packages=["tapi"],
     package_dir={"tapi": "tapi"},
     include_package_data=True,
@@ -47,5 +45,5 @@ setup(
     license="MIT",
     zip_safe=False,
     keywords="tapi,tapioca,wrapper,api",
-    classifiers=["python>=3.5"],
+    classifiers=['Programming Language :: Python :: 3.5'],
 )
