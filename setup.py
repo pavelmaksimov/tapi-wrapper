@@ -9,15 +9,11 @@ except ImportError:
 import os
 import re
 
-try:
-    import pypandoc
-
-    readme = pypandoc.convert("README.md", "rst")
-except (IOError, ImportError):
-    readme = ""
+with open("README.md", "r", encoding="utf8") as fh:
+    readme = fh.read()
 
 package = "tapi"
-requirements = ["requests[security]>=2.6", "arrow>=0.6.0,<1", "six>=1"]
+requirements = ["requests[security]>=2.6", "arrow>=0.6.0,<1"]
 
 
 def get_version(package):
@@ -35,10 +31,10 @@ setup(
     version=get_version(package),
     description="Обертка для написания библиотек для API",
     long_description=readme,
+    long_description_content_type='text/markdown',
     author="Pavel Maksimov",
-    author_email="vur21@ya.ru",
     url="https://github.com/pavelmaksimov/tapi-wrapper",
-    packages=["tapi"],
+    packages=[package],
     include_package_data=True,
     install_requires=requirements,
     license="MIT",
