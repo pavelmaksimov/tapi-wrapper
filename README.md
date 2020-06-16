@@ -5,6 +5,11 @@
 поэтому разработчикам не нужно учиться использовать новый интерфейс/стиль кодирования 
 для каждой службы API.
 
+#### Примеры
+[Библиотека для всех API Яндекс Метрика](https://github.com/pavelmaksimov/tapi-yandex-metrika)
+
+[Библиотека для всех API Яндекс Директ](https://github.com/pavelmaksimov/tapi-yandex-direct)
+
 
 ## Установка
     pip install tapi-wrapper
