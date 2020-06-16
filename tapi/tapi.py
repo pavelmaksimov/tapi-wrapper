@@ -231,6 +231,12 @@ class TapiClientExecutor(TapiClient):
     def __call__(self, *args, **kwargs):
         return self._wrap_in_tapi(self._data.__call__(*args, **kwargs))
 
+    @property
+    def data(self):
+        return self._api.data(
+            self._data, self._request_kwargs, self.response, self._api_params
+        )
+
     def transform(self, *args, **kwargs):
         return self._api.transform(
             self._data,
@@ -251,14 +257,28 @@ class TapiClientExecutor(TapiClient):
             **kwargs
         )
 
-    @property
-    def data(self):
-        return self._api.data(
-            self._data, self._request_kwargs, self.response, self._api_params
-        )
-
     def to_json(self, *args, **kwargs):
         return self._api.to_json(
+            self._data,
+            self._request_kwargs,
+            self.response,
+            self._api_params,
+            *args,
+            **kwargs
+        )
+
+    def to_dict(self, *args, **kwargs):
+        return self._api.to_dict(
+            self._data,
+            self._request_kwargs,
+            self.response,
+            self._api_params,
+            *args,
+            **kwargs
+        )
+
+    def to_list(self, *args, **kwargs):
+        return self._api.to_list(
             self._data,
             self._request_kwargs,
             self.response,

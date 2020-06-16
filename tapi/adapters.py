@@ -216,6 +216,12 @@ class JSONAdapterMixin(object):
         """Преобразователь данных в json."""
         raise NotImplementedError
 
+    def to_dict(self, data, request_kwargs, response, api_params, *args, **kwargs):
+        raise NotImplementedError
+
+    def to_list(self, data, request_kwargs, response, api_params, *args, **kwargs):
+        raise NotImplementedError
+
     def to_df(self, data, request_kwargs, response, api_params, *args, **kwargs):
         """Преобразователь данных в DataFrame."""
         raise NotImplementedError
