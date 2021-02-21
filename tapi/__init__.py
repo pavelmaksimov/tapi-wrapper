@@ -2,8 +2,8 @@
 
 from __future__ import unicode_literals
 
-__author__ = 'Pavel Maksimov'
-__email__ = 'vur21@ya.ru'
+__author__ = 'Filipe Ximenes'
+__email__ = 'filipeximenes@gmail.com'
 __version__ = '2020.06.16'
 
 
