@@ -14,13 +14,4 @@
 ## Установка
     pip install tapi-wrapper
 
-## Автор
-Павел Максимов
-
-Связаться со мной можно в 
-[Телеграм](https://t.me/pavel_maksimow) 
-и в 
-[Facebook](https://www.facebook.com/pavel.maksimow)
-
-## Другие авторы
 Создано на базе [Tapioca-Wrapper](https://github.com/vintasoftware/tapi-wrapper)
