@@ -7,21 +7,21 @@ import unittest
 import responses
 import requests
 
-from tapioca.exceptions import (
+from tapi.exceptions import (
     ClientError, ServerError, ResponseProcessException,
-    TapiocaException)
-from tapioca.tapioca import TapiocaClient
+    TapiException)
+from tapi.tapi import TapiClient
 
 from tests.client import TesterClient, TesterClientAdapter
 
 
-class TestTapiocaException(unittest.TestCase):
+class TestTapiException(unittest.TestCase):
 
     def setUp(self):
         self.wrapper = TesterClient()
 
     @responses.activate
-    def test_exception_contain_tapioca_client(self):
+    def test_exception_contain_tapi_client(self):
         responses.add(responses.GET, self.wrapper.test().data,
                       body='{"data": {"key": "value"}}',
                       status=400,
@@ -29,10 +29,10 @@ class TestTapiocaException(unittest.TestCase):
 
         try:
             self.wrapper.test().get()
-        except TapiocaException as e:
+        except TapiException as e:
             exception = e
 
-        self.assertIs(exception.client.__class__, TapiocaClient)
+        self.assertIs(exception.client.__class__, TapiClient)
 
     @responses.activate
     def test_exception_contain_status_code(self):
@@ -43,7 +43,7 @@ class TestTapiocaException(unittest.TestCase):
 
         try:
             self.wrapper.test().get()
-        except TapiocaException as e:
+        except TapiException as e:
             exception = e
 
         self.assertIs(exception.status_code, 400)
@@ -57,7 +57,7 @@ class TestTapiocaException(unittest.TestCase):
 
         try:
             self.wrapper.test().get()
-        except TapiocaException as e:
+        except TapiException as e:
             exception = e
 
         self.assertEqual(str(exception), 'response status code: 400')
@@ -78,7 +78,7 @@ class TestExceptions(unittest.TestCase):
         response = requests.get(self.wrapper.test().data)
 
         with self.assertRaises(ResponseProcessException):
-            TesterClientAdapter().process_response(response)
+            TesterClientAdapter().process_response(response, {})
 
     @responses.activate
     def test_adapter_raises_response_process_exception_on_500s(self):
@@ -90,7 +90,7 @@ class TestExceptions(unittest.TestCase):
         response = requests.get(self.wrapper.test().data)
 
         with self.assertRaises(ResponseProcessException):
-            TesterClientAdapter().process_response(response)
+            TesterClientAdapter().process_response(response, {})
 
     @responses.activate
     def test_raises_request_error(self):

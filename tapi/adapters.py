@@ -1,0 +1,224 @@
+# coding: utf-8
+import json
+import re
+
+from .exceptions import (
+    ResponseProcessException,
+    ClientError,
+    ServerError,
+    NotFound404Error,
+)
+from .serializers import SimpleSerializer
+from .tapi import TapiInstantiator, TapiClientExecutor
+
+
+def generate_wrapper_from_adapter(adapter_class):
+    return TapiInstantiator(adapter_class)
+
+
+class TapiAdapter(object):
+    serializer_class = SimpleSerializer
+    api_root = NotImplementedError
+    resource_mapping = NotImplementedError
+
+    def __init__(self, serializer_class=None, *args, **kwargs):
+        if serializer_class:
+            self.serializer = serializer_class()
+        else:
+            self.serializer = self.get_serializer()
+
+    @property
+    def native_methods(self):
+        """Make custom attributes and methods to native"""
+        base_attributes = {
+            *dir(TapiAdapter),
+            *dir(TapiClientExecutor),
+            *dir(JSONAdapterMixin),
+            "serializer",
+        }
+        a = [
+            attr
+            for attr in dir(self)
+            if not attr.startswith("_") and attr not in base_attributes
+        ]
+        return a
+
+    def _method_to_native(self, method_name, **kwargs):
+        return getattr(self, method_name)(**kwargs)
+
+    def _value_to_native(self, method_name, value, **kwargs):
+        return self.serializer.deserialize(method_name, value, **kwargs)
+
+    def _get_to_native_method(self, method_name, data, **context):
+        if not self.serializer and method_name not in self.native_methods:
+            raise NotImplementedError(
+                "This client does not have a serializer and not have native methods"
+            )
+
+        if method_name in self.native_methods:
+
+            def to_native_wrapper(**kwargs):
+                return self._method_to_native(
+                    method_name, data=data, **{**context, **kwargs}
+                )
+
+        else:
+
+            def to_native_wrapper(**kwargs):
+                return self._value_to_native(method_name, data, **kwargs)
+
+        return to_native_wrapper
+
+    def get_serializer(self):
+        if self.serializer_class:
+            return self.serializer_class()
+
+    def get_api_root(self, api_params, resource_name):
+        return self.api_root
+
+    def fill_resource_template_url(self, template, params, resource):
+        """Create of url request"""
+        try:
+            return template.format(**params)
+        except KeyError as error:
+            all_keys = re.findall(r"{(.[^\}]*)", template)
+            not_set_keys = set(all_keys) - set(params.keys())
+            examples = []
+            for key in not_set_keys:
+                examples.append("{}=<value>".format(key))
+            examples = ", ".join(examples)
+            not_set_keys = "', '".join(not_set_keys)
+
+            error.args = (
+                "URL parameters '{}' not set. Example: client.{}({}).get()".format(
+                    not_set_keys, resource, examples
+                ),
+            )
+            raise
+
+    def get_request_kwargs(self, api_params, *args, **kwargs):
+        """Adding parameters to a request"""
+        serialized = self.serialize_data(kwargs.get("data"))
+
+        kwargs.update({"data": self.format_data_to_request(serialized)})
+        return kwargs
+
+    def get_error_message(self, data, response=None):
+        """Get error from response."""
+        return str(data)
+
+    def process_response(self, response, request_kwargs, **kwargs):
+        """Processing request responses."""
+        if response.status_code == 404:
+            raise ResponseProcessException(NotFound404Error, None)
+        elif 500 <= response.status_code < 600:
+            raise ResponseProcessException(ServerError, None)
+
+        data = self.response_to_native(response)
+
+        if 400 <= response.status_code < 500:
+            raise ResponseProcessException(ClientError, data)
+
+        return data
+
+    def error_handling(
+        self,
+        tapi_exception,
+        error_message,
+        repeat_number,
+        response,
+        request_kwargs,
+        api_params,
+        **kwargs
+    ):
+        """
+        Wrapper for throwing custom exceptions. When,
+        for example, the server responds with 200,
+        and errors are passed inside json.
+        """
+        raise tapi_exception
+
+    def serialize_data(self, data):
+        if self.serializer:
+            return self.serializer.serialize(data)
+
+        return data
+
+    def format_data_to_request(self, data):
+        raise NotImplementedError()
+
+    def response_to_native(self, response):
+        raise NotImplementedError()
+
+    def get_iterator_iteritems(
+        self, response_data, response, request_kwargs, api_params, **kwargs
+    ):
+        raise NotImplementedError()
+
+    def get_iterator_pages(
+        self, response_data, response, request_kwargs, api_params, **kwargs
+    ):
+        raise NotImplementedError()
+
+    def get_iterator_items(self, data, response, request_kwargs, api_params, **kwargs):
+        raise NotImplementedError()
+
+    def get_iterator_next_request_kwargs(
+        self, response_data, response, request_kwargs, api_params, **kwargs
+    ):
+        raise NotImplementedError()
+
+    def is_authentication_expired(self, tapi_exception, *args, **kwargs):
+        return False
+
+    def refresh_authentication(self, api_params, *args, **kwargs):
+        raise NotImplementedError()
+
+    def retry_request(
+        self,
+        tapi_exception,
+        error_message,
+        repeat_number,
+        response,
+        request_kwargs,
+        api_params,
+        **kwargs
+    ):
+        """
+        Conditions for repeating a request.
+        If it returns True, the request will be repeated.
+        """
+        return False
+
+    def __str__(self, data=None, request_kwargs=None, response=None, api_params=None):
+        raise NotImplementedError()
+
+
+class JSONAdapterMixin(object):
+    def get_request_kwargs(self, api_params, *args, **kwargs):
+        arguments = super(JSONAdapterMixin, self).get_request_kwargs(
+            api_params, *args, **kwargs
+        )
+        if "headers" not in arguments:
+            arguments["headers"] = {}
+        arguments["headers"]["Content-Type"] = "application/json"
+
+        return arguments
+
+    def format_data_to_request(self, data):
+        if data:
+            return json.dumps(data)
+
+    def response_to_native(self, response):
+        if response.content.strip():
+            try:
+                return json.loads(response.content.decode())
+            except json.JSONDecodeError:
+                return response.text
+
+    def get_error_message(self, data, response=None):
+        if not data and response.content.strip():
+            data = json.loads(response.content.decode())
+
+        if data:
+            return data.get("error", None)

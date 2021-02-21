@@ -1,21 +1,16 @@
 # coding: utf-8
-
 from __future__ import unicode_literals
 
-import unittest
-import responses
 import json
+import unittest
 
-import xmltodict
-from collections import OrderedDict
+import responses
 
-from tapioca.tapioca import TapiocaClient
-from tapioca.exceptions import ClientError, ServerError
-
-from tests.client import TesterClient, TokenRefreshClient, XMLClient, FailTokenRefreshClient
+from tapi.exceptions import ClientError, ServerError
+from tests.client import TesterClient, TokenRefreshClient, FailTokenRefreshClient
 
 
-class TestTapiocaClient(unittest.TestCase):
+class TestTapiClient(unittest.TestCase):
 
     def setUp(self):
         self.wrapper = TesterClient()
@@ -35,20 +30,26 @@ class TestTapiocaClient(unittest.TestCase):
         self.assertEqual(resource.data, expected_url)
 
     def test_calling_len_on_tapioca_list(self):
-        client = self.wrapper._wrap_in_tapioca([0, 1, 2])
+        client = self.wrapper._wrap_in_tapi([0, 1, 2])
         self.assertEqual(len(client), 3)
 
-    def test_iterated_client_items_should_be_tapioca_instances(self):
-        client = self.wrapper._wrap_in_tapioca([0, 1, 2])
-
-        for item in client:
-            self.assertTrue(isinstance(item, TapiocaClient))
-
-    def test_iterated_client_items_should_contain_list_items(self):
-        client = self.wrapper._wrap_in_tapioca([0, 1, 2])
+    def test_iterated_client_items(self):
+        client = self.wrapper._wrap_in_tapi([0, 1, 2])
 
         for i, item in enumerate(client):
-            self.assertEqual(item().data, i)
+            self.assertEqual(item, i)
+
+    def test_client_data_dict(self):
+        client = self.wrapper._wrap_in_tapi({"data": 0})
+
+        assert client["data"] == 0
+        assert client.data == {"data": 0}
+
+    def test_client_data_list(self):
+        client = self.wrapper._wrap_in_tapi([0, 1, 2])
+
+        assert client[0] == 0
+        assert client[1] == 1
 
     @responses.activate
     def test_in_operator(self):
@@ -62,34 +63,6 @@ class TestTapiocaClient(unittest.TestCase):
         self.assertIn('data', response)
         self.assertIn('other', response)
         self.assertNotIn('wat', response)
-
-    @responses.activate
-    def test_transform_camelCase_in_snake_case(self):
-        next_url = 'http://api.teste.com/next_batch'
-
-        responses.add(responses.GET, self.wrapper.test().data,
-                      body='{"data" :{"key_snake": "value", "camelCase": "data in camel case", "NormalCamelCase": "data in camel case"}, "paging": {"next": "%s"}}' % next_url,
-                      status=200,
-                      content_type='application/json')
-
-        response = self.wrapper.test().get()
-
-        self.assertEqual(response.data.key_snake().data, 'value')
-        self.assertEqual(response.data.camel_case().data, 'data in camel case')
-        self.assertEqual(response.data.normal_camel_case().data, 'data in camel case')
-
-    @responses.activate
-    def test_should_be_able_to_access_by_index(self):
-        responses.add(responses.GET, self.wrapper.test().data,
-                      body='["a", "b", "c"]',
-                      status=200,
-                      content_type='application/json')
-
-        response = self.wrapper.test().get()
-
-        self.assertEqual(response[0]().data, 'a')
-        self.assertEqual(response[1]().data, 'b')
-        self.assertEqual(response[2]().data, 'c')
 
     @responses.activate
     def test_accessing_index_out_of_bounds_should_raise_index_error(self):
@@ -120,7 +93,7 @@ class TestTapiocaClient(unittest.TestCase):
         self.assertEqual(wrapper.user().data, 'https://api.test.com/user/123/')
 
 
-class TestTapiocaExecutor(unittest.TestCase):
+class TestTapiExecutor(unittest.TestCase):
 
     def setUp(self):
         self.wrapper = TesterClient()
@@ -135,39 +108,25 @@ class TestTapiocaExecutor(unittest.TestCase):
         self.assertEqual(
             '\n'.join(self.wrapper.resource.__doc__.split('\n')[1:]),
             'Resource: ' + self.wrapper.resource._resource['resource'] + '\n'
-            'Docs: ' + self.wrapper.resource._resource['docs'] + '\n'
-            'Foo: ' + self.wrapper.resource._resource['foo'] + '\n'
-            'Spam: ' + self.wrapper.resource._resource['spam'])
-
-    def test_access_data_attributres_through_executor(self):
-        client = self.wrapper._wrap_in_tapioca({'test': 'value'})
-
-        items = client().items()
-
-        self.assertTrue(isinstance(items, TapiocaClient))
-
-        data = dict(items().data)
-
-        self.assertEqual(data, {'test': 'value'})
-
-    def test_is_possible_to_reverse_a_list_through_executor(self):
-        client = self.wrapper._wrap_in_tapioca([0, 1, 2])
-        client().reverse()
-        self.assertEqual(client().data, [2, 1, 0])
+                                                                         'Docs: ' + self.wrapper.resource._resource[
+                'docs'] + '\n'
+                          'Foo: ' + self.wrapper.resource._resource['foo'] + '\n'
+                                                                             'Spam: ' + self.wrapper.resource._resource[
+                'spam'])
 
     def test_cannot__getittem__(self):
-        client = self.wrapper._wrap_in_tapioca([0, 1, 2])
+        client = self.wrapper._wrap_in_tapi([0, 1, 2])
         with self.assertRaises(Exception):
             client()[0]
 
     def test_cannot_iterate(self):
-        client = self.wrapper._wrap_in_tapioca([0, 1, 2])
+        client = self.wrapper._wrap_in_tapi([0, 1, 2])
         with self.assertRaises(Exception):
             for item in client():
                 pass
 
     def test_dir_call_returns_executor_methods(self):
-        client = self.wrapper._wrap_in_tapioca([0, 1, 2])
+        client = self.wrapper._wrap_in_tapi([0, 1, 2])
 
         e_dir = dir(client())
 
@@ -218,7 +177,7 @@ class TestTapiocaExecutor(unittest.TestCase):
         self.assertEqual(response().status_code, 200)
 
 
-class TestTapiocaExecutorRequests(unittest.TestCase):
+class TestTapiExecutorRequests(unittest.TestCase):
 
     def setUp(self):
         self.wrapper = TesterClient()
@@ -251,9 +210,7 @@ class TestTapiocaExecutorRequests(unittest.TestCase):
 
         response = self.wrapper.test().get()
 
-        response_data = response.data()
-
-        self.assertEqual(response_data.data, {'key': 'value'})
+        self.assertEqual(response.data, {"data": {"key": "value"}})
 
     @responses.activate
     def test_post_request(self):
@@ -308,14 +265,12 @@ class TestTapiocaExecutorRequests(unittest.TestCase):
 
         response = self.wrapper.test().get()
 
-        request_kwargs = response.data.key()._request_kwargs
-
-        self.assertIn('url', request_kwargs)
-        self.assertIn('data', request_kwargs)
-        self.assertIn('headers', request_kwargs)
+        self.assertIn('url', response._request_kwargs)
+        self.assertIn('data', response._request_kwargs)
+        self.assertIn('headers', response._request_kwargs)
 
     @responses.activate
-    def test_thrown_tapioca_exception_with_clienterror_data(self):
+    def test_thrown_tapi_exception_with_clienterror_data(self):
         responses.add(responses.GET, self.wrapper.test().data,
                       body='{"error": "bad request test"}',
                       status=400,
@@ -325,7 +280,7 @@ class TestTapiocaExecutorRequests(unittest.TestCase):
         self.assertIn("bad request test", client_exception.exception.args)
 
     @responses.activate
-    def test_thrown_tapioca_exception_with_servererror_data(self):
+    def test_thrown_tapi_exception_with_servererror_data(self):
         responses.add(responses.GET, self.wrapper.test().data,
                       body='{"error": "server error test"}',
                       status=500,
@@ -358,7 +313,7 @@ class TestIteratorFeatures(unittest.TestCase):
 
         iterations_count = 0
         for item in response().pages():
-            self.assertIn(item.key().data, 'value')
+            self.assertIn(item["key"], 'value')
             iterations_count += 1
 
         self.assertEqual(iterations_count, 2)
@@ -380,8 +335,8 @@ class TestIteratorFeatures(unittest.TestCase):
         response = self.wrapper.test().get()
 
         iterations_count = 0
-        for item in response().pages(max_items=3, max_pages=2):
-            self.assertIn(item.key().data, 'value')
+        for item in response().iter_items(max_items=3, max_pages=2):
+            self.assertIn(item["key"], 'value')
             iterations_count += 1
 
         self.assertEqual(iterations_count, 3)
@@ -412,8 +367,8 @@ class TestIteratorFeatures(unittest.TestCase):
         response = self.wrapper.test().get()
 
         iterations_count = 0
-        for item in response().pages(max_pages=3):
-            self.assertIn(item.key().data, 'value')
+        for item in response().iter_items(max_pages=3):
+            self.assertIn(item["key"], 'value')
             iterations_count += 1
 
         self.assertEqual(iterations_count, 7)
@@ -458,7 +413,7 @@ class TestIteratorFeatures(unittest.TestCase):
         response = self.wrapper.test().get()
 
         iterations_count = 0
-        for item in response().pages(max_items=0):
+        for item in response().iter_items(max_items=0):
             self.assertIn(item.key().data, 'value')
             iterations_count += 1
 
@@ -561,92 +516,3 @@ class TestTokenRefreshing(unittest.TestCase):
         response = self.wrapper.test().post()
 
         self.assertEqual(response().refresh_data, 'new_token')
-
-
-class TestXMLRequests(unittest.TestCase):
-
-    def setUp(self):
-        self.wrapper = XMLClient()
-
-    @responses.activate
-    def test_xml_post_string(self):
-        responses.add(responses.POST, self.wrapper.test().data,
-                      body='Any response', status=200, content_type='application/json')
-
-        data = ('<tag1 attr1="val1">'
-                '<tag2>text1</tag2>'
-                '<tag3>text2</tag3>'
-                '</tag1>')
-
-        self.wrapper.test().post(data=data)
-
-        request_body = responses.calls[0].request.body
-
-        self.assertEqual(request_body, data.encode('utf-8'))
-
-    @responses.activate
-    def test_xml_post_dict(self):
-        responses.add(responses.POST, self.wrapper.test().data,
-                      body='Any response', status=200, content_type='application/json')
-
-        data = OrderedDict([
-            ('tag1', OrderedDict([
-                ('@attr1', 'val1'), ('tag2', 'text1'), ('tag3', 'text2')
-            ]))
-        ])
-
-        self.wrapper.test().post(data=data)
-
-        request_body = responses.calls[0].request.body
-
-        self.assertEqual(request_body, xmltodict.unparse(data).encode('utf-8'))
-
-    @responses.activate
-    def test_xml_post_dict_passes_unparse_param(self):
-        responses.add(responses.POST, self.wrapper.test().data,
-                      body='Any response', status=200, content_type='application/json')
-
-        data = OrderedDict([
-            ('tag1', OrderedDict([
-                ('@attr1', 'val1'), ('tag2', 'text1'), ('tag3', 'text2')
-            ]))
-        ])
-
-        self.wrapper.test().post(data=data, xmltodict_unparse__full_document=False)
-
-        request_body = responses.calls[0].request.body
-
-        self.assertEqual(request_body, xmltodict.unparse(
-            data, full_document=False).encode('utf-8'))
-
-    @responses.activate
-    def test_xml_returns_text_if_response_not_xml(self):
-        responses.add(responses.POST, self.wrapper.test().data,
-                      body='Any response', status=200, content_type='any content')
-
-        data = OrderedDict([
-            ('tag1', OrderedDict([
-                ('@attr1', 'val1'), ('tag2', 'text1'), ('tag3', 'text2')
-            ]))
-        ])
-
-        response = self.wrapper.test().post(data=data)
-
-        self.assertEqual('Any response', response().data['text'])
-
-    @responses.activate
-    def test_xml_post_dict_returns_dict_if_response_xml(self):
-        xml_body = '<tag1 attr1="val1">text1</tag1>'
-        responses.add(responses.POST, self.wrapper.test().data,
-                      body=xml_body, status=200,
-                      content_type='application/xml')
-
-        data = OrderedDict([
-            ('tag1', OrderedDict([
-                ('@attr1', 'val1'), ('tag2', 'text1'), ('tag3', 'text2')
-            ]))
-        ])
-
-        response = self.wrapper.test().post(data=data)
-
-        self.assertEqual(response().data, xmltodict.parse(xml_body))

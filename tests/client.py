@@ -2,11 +2,11 @@
 
 from __future__ import unicode_literals
 
-from tapioca.adapters import (
-    TapiocaAdapter, JSONAdapterMixin, XMLAdapterMixin,
-    generate_wrapper_from_adapter)
-from tapioca.serializers import SimpleSerializer
-
+from tapi.adapters import (
+    TapiAdapter, JSONAdapterMixin,
+    generate_wrapper_from_adapter
+)
+from tapi.serializers import SimpleSerializer
 
 RESOURCE_MAPPING = {
     'test': {
@@ -30,22 +30,27 @@ RESOURCE_MAPPING = {
 }
 
 
-class TesterClientAdapter(JSONAdapterMixin, TapiocaAdapter):
+class TesterClientAdapter(JSONAdapterMixin, TapiAdapter):
     serializer_class = None
     api_root = 'https://api.test.com'
     resource_mapping = RESOURCE_MAPPING
 
-    def get_api_root(self, api_params, **kwargs):
-        if kwargs.get('resource_name') == 'another_root':
+    def get_api_root(self, api_params, resource_name):
+        if resource_name == 'another_root':
             return 'https://api.another.com/'
         else:
             return self.api_root
 
+    def get_iterator_pages(self, response_data, **kwargs):
+        return response_data['data']
+
+    def get_iterator_iteritems(self, response_data, **kwargs):
+        return response_data['data']
+
     def get_iterator_list(self, response_data):
         return response_data['data']
 
-    def get_iterator_next_request_kwargs(self, iterator_request_kwargs,
-                                         response_data, response):
+    def get_iterator_next_request_kwargs(self, response_data, response, request_kwargs, api_params, **kwargs):
         paging = response_data.get('paging')
         if not paging:
             return
@@ -92,11 +97,3 @@ class FailTokenRefreshClientAdapter(TokenRefreshClientAdapter):
 
 
 FailTokenRefreshClient = generate_wrapper_from_adapter(FailTokenRefreshClientAdapter)
-
-
-class XMLClientAdapter(XMLAdapterMixin, TapiocaAdapter):
-    api_root = 'https://api.test.com'
-    resource_mapping = RESOURCE_MAPPING
-
-
-XMLClient = generate_wrapper_from_adapter(XMLClientAdapter)

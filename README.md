@@ -1,39 +1,30 @@
-# Tapioca-Wrapper
-
-[![Join the chat at https://gitter.im/vintasoftware/tapioca-wrapper](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/vintasoftware/tapioca-wrapper?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Build Status](https://travis-ci.org/vintasoftware/tapioca-wrapper.svg?branch=master)](https://travis-ci.org/vintasoftware/tapioca-wrapper)
-[![Coverage Status](https://coveralls.io/repos/vintasoftware/tapioca-wrapper/badge.svg?branch=master&service=github)](https://coveralls.io/github/vintasoftware/tapioca-wrapper?branch=master)
-[![Current version at PyPI](https://img.shields.io/pypi/v/tapioca-wrapper.svg)](https://pypi.python.org/pypi/tapioca-wrapper)
-![Supported Python Versions](https://img.shields.io/pypi/pyversions/tapioca-wrapper.svg)
+# Tapi-Wrapper
+![Supported Python Versions](https://img.shields.io/static/v1?label=python&message=>=3.5&color=red)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/vintasoftware/tapioca-wrapper/master/LICENSE)
-
-![](docs/static/logo.png)
+[![Downloads](https://pepy.tech/badge/tapi-wrapper)](https://pepy.tech/project/tapi-yandex-metrika)
+<a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 
 Tapioca helps you generating Python clients for APIs.
 APIs wrapped by Tapioca are explorable and follow a simple interaction pattern that works uniformly so developers don't need to learn how to use a new coding interface/style for each service API.
 
 
-## Documentation
+### Api examples
+[Yandex Metrika API](https://github.com/pavelmaksimov/tapi-yandex-metrika)
 
-Full documentation hosted by [readthedocs](http://tapioca-wrapper.readthedocs.org/).
-
-## Flavours
-
-You can find the full list of available tapioca clients [here](http://tapioca-wrapper.readthedocs.org/en/stable/flavours.html).
-
-To create new flavours, refer to [Building a wrapper](http://tapioca-wrapper.readthedocs.org/en/stable/buildingawrapper.html) in the documentation. There is also a [cookiecutter template](https://github.com/vintasoftware/cookiecutter-tapioca) to help bootstraping new API clients.
+[Yandex Direct API](https://github.com/pavelmaksimov/tapi-yandex-direct)
 
 
-## Other resources
+### Installed
+    pip install tapi-wrapper==2021.2.20
 
-- [Contributors](https://github.com/vintasoftware/tapioca-wrapper/graphs/contributors)
-- [Changelog](http://tapioca-wrapper.readthedocs.org/en/stable/changelog.html)
-- [Blog post explaining the basics about Tapioca](http://www.vinta.com.br/blog/2016/python-api-clients-with-tapioca/)
 
-## Help
+### Help
+[Телеграм](https://t.me/pavel_maksimow),
+[Facebook](https://www.facebook.com/pavel.maksimow)
 
-If you have any questions or need help, please send an email to: contact@vinta.com.br
+### Authors
+The author of this modification Pavel Maksimov
+___
+Powered by [Tapioca-Wrapper](https://github.com/vintasoftware/tapi-wrapper)
 
-## Commercial Support
-
-This project, as other Vinta open-source projects, is used in products of Vinta clients. We are always looking for exciting work, so if you need any commercial support, feel free to get in touch: contact@vinta.com.br
+Copyright (c) 2013-2015 Vinta Software
