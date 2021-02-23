@@ -241,6 +241,7 @@ class TapiClientExecutor(TapiClient):
     def __getattr__(self, name):
         if name.startswith("to_") or name in self._api.native_methods:
             return self._api._get_to_native_method(name, self._data, **self._context())
+        raise AttributeError(name)
 
     def __call__(self, *args, **kwargs):
         return self._wrap_in_tapi(self._data.__call__(*args, **kwargs))
