@@ -141,7 +141,16 @@ class TapiClient(object):
         resource_mapping = self._api.resource_mapping
         if name in resource_mapping:
             resource = resource_mapping[name]
-            api_root = self._api.get_api_root(self._api_params, resource_name=name)
+
+            try:
+                api_root = self._api.get_api_root(self._api_params, resource_name=name)
+            except TypeError as exc:
+                if exc.args == ("get_api_root() got an unexpected keyword argument 'resource_name'",):
+                    raise Exception(
+                        "Your API client does not support new version tapi-wrapper>=2021.2.20. "
+                        "Install a later version: pip install --upgrade tapi-wrapper==2020.6.16"
+                    )
+                raise
 
             url = api_root.rstrip("/") + "/" + resource["resource"].lstrip("/")
             return self._wrap_in_tapi(url, resource=resource, resource_name=name)
