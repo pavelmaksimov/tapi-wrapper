@@ -80,21 +80,16 @@ class TapiAdapter(object):
         """Create of url request"""
         try:
             return template.format(**params)
-        except KeyError as error:
+        except KeyError:
             all_keys = re.findall(r"{(.[^\}]*)", template)
-            not_set_keys = set(all_keys) - set(params.keys())
-            examples = []
-            for key in not_set_keys:
-                examples.append("{}=<value>".format(key))
-            examples = ", ".join(examples)
-            not_set_keys = "', '".join(not_set_keys)
+            range_not_set_keys = set(all_keys) - set(params.keys())
+            not_set_keys = "', '".join(range_not_set_keys)
 
-            error.args = (
-                "URL parameters '{}' not set. Example: client.{}({}).get()".format(
-                    not_set_keys, resource, examples
-                ),
+            raise TypeError(
+                "{}() missing {} required url params: '{}'".format(
+                    resource, len(range_not_set_keys), not_set_keys
+                )
             )
-            raise
 
     def get_request_kwargs(self, api_params, *args, **kwargs):
         """Adding parameters to a request"""
