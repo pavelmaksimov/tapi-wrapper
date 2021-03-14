@@ -1,12 +1,10 @@
-# coding: utf-8
-
 from __future__ import unicode_literals
 
-from tapi.adapters import (
+from tapi2.adapters import (
     TapiAdapter, JSONAdapterMixin,
     generate_wrapper_from_adapter
 )
-from tapi.serializers import SimpleSerializer
+from tapi2.serializers import SimpleSerializer
 
 RESOURCE_MAPPING = {
     'test': {

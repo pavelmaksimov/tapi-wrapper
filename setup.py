@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 try:
     from setuptools import setup
@@ -12,7 +11,7 @@ import re
 with open("README.md", "r", encoding="utf8") as fh:
     readme = fh.read()
 
-package = "tapi"
+package = "tapi2"
 
 test_requirements = [
     'responses>=0.5',
@@ -30,7 +29,7 @@ def get_version(package):
 
 
 setup(
-    name="tapi-wrapper",
+    name="tapi-wrapper2",
     version=get_version(package),
     description='Python API client generator',
     long_description=readme,

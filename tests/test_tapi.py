@@ -1,4 +1,3 @@
-# coding: utf-8
 from __future__ import unicode_literals
 
 import json
@@ -6,7 +5,7 @@ import unittest
 
 import responses
 
-from tapi.exceptions import ClientError, ServerError
+from tapi2.exceptions import ClientError, ServerError
 from tests.client import TesterClient, TokenRefreshClient, FailTokenRefreshClient
 
 

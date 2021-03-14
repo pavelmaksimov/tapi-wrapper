@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 import pytest
 
-from tapi.adapters import TapiAdapter
+from tapi2.adapters import TapiAdapter
 
 
 def test_fill_resource_template_url():

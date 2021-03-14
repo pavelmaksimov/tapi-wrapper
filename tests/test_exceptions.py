@@ -1,5 +1,3 @@
-# coding: utf-8
-
 from __future__ import unicode_literals
 
 import unittest
@@ -7,10 +5,10 @@ import unittest
 import responses
 import requests
 
-from tapi.exceptions import (
+from tapi2.exceptions import (
     ClientError, ServerError, ResponseProcessException,
     TapiException)
-from tapi.tapi import TapiClient
+from tapi2.tapi import TapiClient
 
 from tests.client import TesterClient, TesterClientAdapter
 
