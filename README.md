@@ -1,6 +1,6 @@
 # Tapi-Wrapper
-![Supported Python Versions](https://img.shields.io/static/v1?label=python&message=>=3.5&color=red)
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/vintasoftware/tapioca-wrapper/master/LICENSE)
+![Supported Python Versions](https://img.shields.io/static/v1?label=python&message=>=3.6&color=blue)
+[![GitHub license](https://img.shields.io/badge/license-MIT-green.svg)](https://raw.githubusercontent.com/vintasoftware/tapioca-wrapper/master/LICENSE)
 [![Downloads](https://pepy.tech/badge/tapi-wrapper)](https://pepy.tech/project/tapi-yandex-metrika)
 <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 
@@ -15,7 +15,7 @@ APIs wrapped by Tapioca are explorable and follow a simple interaction pattern t
 
 
 ### Installed
-    pip install tapi-wrapper2==0.1.0
+    pip install tapi-wrapper2==0.1.1
 
 
 ### Help
