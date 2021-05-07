@@ -60,8 +60,16 @@ class TapiClient(object):
         return self._data
 
     @property
+    def request_kwargs(self):
+        return self._request_kwargs
+
+    @property
     def response(self):
         return self._response
+
+    @property
+    def status_code(self):
+        return self.response.status_code
 
     def _instatiate_api(self):
         serializer_class = None
