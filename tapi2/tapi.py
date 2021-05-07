@@ -71,10 +71,12 @@ class TapiClient(object):
 
     def _wrap_in_tapi(self, data, *args, **kwargs):
         request_kwargs = kwargs.pop("request_kwargs", self._request_kwargs)
+        response = kwargs.pop("response", self._response)
         return TapiClient(
             self._instatiate_api(),
             data=data,
             api_params=self._api_params,
+            response=response,
             request_kwargs=request_kwargs,
             refresh_token_by_default=self._refresh_token_default,
             refresh_data=self._refresh_data,
