@@ -93,6 +93,7 @@ class TapiClient(object):
             request_kwargs=request_kwargs,
             refresh_token_by_default=self._refresh_token_default,
             refresh_data=self._refresh_data,
+            resource_name=self._resource_name,
             session=self._session,
             store=self.store,
             *args,
@@ -274,6 +275,7 @@ class TapiClientExecutor(TapiClient):
             "api_params": self._api_params,
             "store": self.store,
             "client": self,
+            "resource_name": getattr(self, "resource_name", None),
             **kwargs
         }
 
