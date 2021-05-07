@@ -399,7 +399,9 @@ class TapiClientExecutor(TapiClient):
             if not next_request_kwargs:
                 break
 
-            response = self.get(**next_request_kwargs)
+            request_method = executor._response.request.method.lower()
+            method = getattr(self, request_method)
+            response = method(**next_request_kwargs)
             executor = response()
             iterator_list = executor._get_iterator_iteritems()
 
@@ -424,7 +426,9 @@ class TapiClientExecutor(TapiClient):
             ):
                 break
 
-            response = self.get(**next_request_kwargs)
+            request_method = executor._response.request.method.lower()
+            method = getattr(self, request_method)
+            response = method(**next_request_kwargs)
             executor = response()
             pages = executor._get_iterator_pages()
 
