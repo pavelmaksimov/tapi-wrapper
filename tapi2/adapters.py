@@ -1,5 +1,6 @@
 import json
 import re
+from typing import List
 
 from .exceptions import (
     ResponseProcessException,
@@ -15,16 +16,63 @@ def generate_wrapper_from_adapter(adapter_class):
     return TapiInstantiator(adapter_class)
 
 
+class Resource:
+    def __init__(
+        self,
+        name: str,
+        url: str,
+        url_docs: str = None,
+        allowed_http_methods: List[str] = None,
+        descriptions: str = None,
+        **kwargs
+    ):
+        """
+
+        :param name: Client method name.
+        :param url: Url resource.
+        :param url_docs: URL official documentation.
+        :param allowed_http_methods: Literal["GET", "POST", "PUT", "OPTIONS", "DELETE", "PATCH"]
+        :param descriptions: Descriptions.
+        :param kwargs:
+        """
+        self.name = name
+        self.url = url
+        self.doc_url = url_docs
+        self.allowed_http_methods = allowed_http_methods
+        self.descriptions = descriptions
+        self.kwargs = kwargs
+
+    def dict(self):
+        return {
+            self.name: {
+                **self.kwargs,
+                "resource": self.url,
+                "docs": self.doc_url,
+                "methods": self.allowed_http_methods,
+                "descriptions": self.descriptions,
+            }
+        }
+
+    def __getitem__(self, item):
+        return self.dict()[item]
+
+
 class TapiAdapter(object):
     serializer_class = SimpleSerializer
     api_root = NotImplementedError
-    resource_mapping = NotImplementedError
+    resource_mapping: dict = NotImplementedError
 
-    def __init__(self, serializer_class=None, *args, **kwargs):
+    def __init__(
+        self, serializer_class=None, resource_mapping: List[Resource] = None, **kwargs
+    ):
         if serializer_class:
             self.serializer = serializer_class()
         else:
             self.serializer = self.get_serializer()
+
+        if resource_mapping:
+            for resource in resource_mapping:
+                self.resource_mapping.update(resource.dict())
 
     @property
     def native_methods(self):
