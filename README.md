@@ -15,7 +15,7 @@ APIs wrapped by Tapioca are explorable and follow a simple interaction pattern t
 
 
 ### Installed
-    pip install tapi-wrapper2==0.1.1
+    pip install tapi-wrapper2==0.1.2
 
 
 ### Help
