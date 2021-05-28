@@ -4,4 +4,4 @@
 .pypirc
 build
 dist
-tapi_wrapper.egg-info
+*.egg-info
