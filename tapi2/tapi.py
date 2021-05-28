@@ -1,4 +1,3 @@
-# coding: utf-8
 from __future__ import unicode_literals
 
 import copy
@@ -16,10 +15,13 @@ class TapiInstantiator(object):
     def __init__(self, adapter_class):
         self.adapter_class = adapter_class
 
-    def __call__(self, serializer_class=None, session=None, **kwargs):
+    def __call__(self, serializer_class=None, session=None, resource_mapping=None, **kwargs):
         refresh_token_default = kwargs.pop("refresh_token_by_default", False)
         return TapiClient(
-            self.adapter_class(serializer_class=serializer_class),
+            self.adapter_class(
+                serializer_class=serializer_class,
+                resource_mapping=resource_mapping,
+            ),
             api_params=kwargs,
             refresh_token_by_default=refresh_token_default,
             session=session,

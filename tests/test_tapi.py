@@ -5,6 +5,7 @@ import unittest
 
 import responses
 
+from tapi2.adapters import Resource
 from tapi2.exceptions import ClientError, ServerError
 from tests.client import TesterClient, TokenRefreshClient, FailTokenRefreshClient
 
@@ -13,6 +14,25 @@ class TestTapiClient(unittest.TestCase):
 
     def setUp(self):
         self.wrapper = TesterClient()
+
+    @responses.activate
+    def test_added_custom_resources(self):
+        wrapper = TesterClient(
+            resource_mapping=[
+                Resource("myresource", "http://url.ru/myresource"),
+                Resource("myresource2", "https://url.ru/myresource2"),
+            ]
+        )
+        responses.add(
+            responses.GET,
+            url=wrapper.myresource().data,
+            body='[]',
+            status=200,
+            content_type='application/json'
+        )
+
+        response = self.wrapper.myresource().get()
+        assert response.data == []
 
     def test_fill_url_template(self):
         expected_url = 'https://api.test.com/user/123/'
