@@ -174,7 +174,7 @@ class TapiClient(object):
     def __getattr__(self, name):
         ret = self._get_client_from_name_or_fallback(name)
         if ret is None:
-            raise AttributeError(name)
+            raise AttributeError(f"Undeclared resource '{name}'")
         return ret
 
     def __getitem__(self, key):

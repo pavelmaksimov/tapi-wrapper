@@ -138,8 +138,7 @@ class TapiAdapter(object):
     def get_request_kwargs(self, api_params, *args, **kwargs):
         """Adding parameters to a request"""
         serialized = self.serialize_data(kwargs.get("data"))
-
-        kwargs.update({"data": self.format_data_to_request(serialized)})
+        kwargs["data"] = self.format_data_to_request(serialized)
         return kwargs
 
     def get_error_message(self, data, response=None):
@@ -235,14 +234,16 @@ class TapiAdapter(object):
 
 class JSONAdapterMixin(object):
     def get_request_kwargs(self, api_params, *args, **kwargs):
-        arguments = super(JSONAdapterMixin, self).get_request_kwargs(
+        request_kwargs = super(JSONAdapterMixin, self).get_request_kwargs(
             api_params, *args, **kwargs
         )
-        if "headers" not in arguments:
-            arguments["headers"] = {}
-        arguments["headers"]["Content-Type"] = "application/json"
+        request_kwargs["headers"] = {
+            "Content-Type": "application/json",
+            **api_params.get("headers", {}),
+            **request_kwargs["headers"],
+        }
 
-        return arguments
+        return request_kwargs
 
     def format_data_to_request(self, data):
         if data:
